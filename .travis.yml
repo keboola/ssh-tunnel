@@ -1,0 +1,7 @@
+sudo: false
+
+services:
+  - docker
+
+script:
+  - docker-compose run app

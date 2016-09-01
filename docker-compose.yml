@@ -1,0 +1,33 @@
+app:
+  build: .
+  volumes:
+      - .:/code
+  working_dir: /code
+  entrypoint: "./phpunit.sh"
+  tty: true
+  stdin_open: true
+  environment:
+    COMMON_DB_USER: root
+    COMMON_DB_PASSWORD: somePassword
+    COMMON_DB_HOST: mysql
+    COMMON_DB_PORT: 3306
+    COMMON_DB_DATABASE: testdb
+  links:
+    - sshproxy
+    - mysql
+
+mysql:
+  image: mysql:5.6
+  environment:
+    MYSQL_DATABASE: testdb
+    MYSQL_ROOT_PASSWORD: somePassword
+
+sshproxy:
+  build: ./tests/env/sshproxy
+  volumes:
+      - ./tests/env/sshproxy:/code
+  working_dir: /code
+  ports:
+    - "2222:22"
+  links:
+    - mysql
