@@ -47,10 +47,11 @@ class SSH
      */
     public function openTunnel(array $config)
     {
-        $missingParams = array_diff_key(
+        $missingParams = array_diff(
             ['user', 'sshHost', 'sshPort', 'localPort', 'remoteHost', 'remotePort', 'privateKey'],
-            $config
+            array_keys($config)
         );
+
         if (!empty($missingParams)) {
             throw new SSHException(sprintf("Missing parameters '%s'", implode(',', $missingParams)));
         }
@@ -89,13 +90,16 @@ class SSH
      * @param string $key
      * @param string $path
      * @return string
+     * @throws SSHException
      */
-    private function writeKeyToFile($key, $path = '/tmp')
+    private function writeKeyToFile($key, $path = '.')
     {
+        if (empty($key)) {
+            throw new SSHException("Key must not be empty");
+        }
         $fileName = 'ssh.' . microtime(true) . '.key';
         file_put_contents($path . '/' . $fileName, $key);
         chmod($fileName, 0600);
         return realpath($fileName);
     }
-
 }
