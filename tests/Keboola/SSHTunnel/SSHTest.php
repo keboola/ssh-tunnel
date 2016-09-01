@@ -32,10 +32,19 @@ class SSHTest extends \PHPUnit_Framework_TestCase
             'localPort' => '33306',
             'remoteHost' => 'mysql',
             'remotePort' => '3306',
-            'privateKey' => getenv('SSH_KEY_PRIVATE')
+            'privateKey' => $this->getPrivateKey()
         ]);
 
         var_dump($process->getOutput());
         var_dump($process->getErrorOutput());
+    }
+
+    private function getPrivateKey()
+    {
+        $privateKey = getenv('SSH_KEY_PRIVATE');
+        if ($privateKey === false) {
+            throw new \Exception("SSH_KEY_PRIVATE environment variable must be set");
+        }
+        return $privateKey;
     }
 }
