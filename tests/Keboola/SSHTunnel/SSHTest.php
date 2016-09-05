@@ -35,8 +35,7 @@ class SSHTest extends \PHPUnit_Framework_TestCase
             'privateKey' => $this->getPrivateKey()
         ]);
 
-        var_dump($process->getOutput());
-        var_dump($process->getErrorOutput());
+        $this->assertEquals(0, $process->getExitCode());
     }
 
     private function getPrivateKey()
