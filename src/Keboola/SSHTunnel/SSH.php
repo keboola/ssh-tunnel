@@ -57,7 +57,7 @@ class SSH
         }
 
         $cmd = sprintf(
-            'ssh -p %s %s@%s -L %s:%s:%s -i %s -fN -o ExitOnForwardFailure=yes -o StrictHostKeyChecking=no',
+            'ssh -p %s %s@%s -L %s:%s:%s -i %s -fN -o ExitOnForwardFailure=yes -o StrictHostKeyChecking=no -o "UserKnownHostsFile /dev/null"',
             $config['sshPort'],
             $config['user'],
             $config['sshHost'],
