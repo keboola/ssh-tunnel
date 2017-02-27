@@ -12,21 +12,20 @@ use Symfony\Component\Process\Process;
 
 class SSH
 {
-    public function __construct()
-    {
-
-    }
-
     public function generateKeyPair()
     {
         $process = new Process("ssh-keygen -b 2048 -t rsa -f ./ssh.key -N '' -q");
         $process->run();
 
-        // return public key
-        return [
-            'private' => file_get_contents('ssh.key'),
-            'public' => file_get_contents('ssh.key.pub')
+        $res = [
+            'private' => file_get_contents('./ssh.key'),
+            'public' => file_get_contents('./ssh.key.pub')
         ];
+
+        @unlink('./ssh.key');
+        @unlink('./ssh.key.pub');
+
+        return $res;
     }
 
     /**
@@ -88,17 +87,16 @@ class SSH
 
     /**
      * @param string $key
-     * @param string $path
      * @return string
      * @throws SSHException
      */
-    private function writeKeyToFile($key, $path = '.')
+    private function writeKeyToFile($key)
     {
         if (empty($key)) {
             throw new SSHException("Key must not be empty");
         }
-        $fileName = 'ssh.' . microtime(true) . '.key';
-        file_put_contents($path . '/' . $fileName, $key);
+        $fileName = tempnam('/tmp/',  'ssh-key-');
+        file_put_contents($fileName, $key);
         chmod($fileName, 0600);
         return realpath($fileName);
     }

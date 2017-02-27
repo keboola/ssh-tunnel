@@ -4,4 +4,4 @@ services:
   - docker
 
 script:
-  - docker-compose run app
+  - docker-compose run --rm app
