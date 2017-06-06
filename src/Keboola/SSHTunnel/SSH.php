@@ -12,6 +12,8 @@ use Symfony\Component\Process\Process;
 
 class SSH
 {
+    const SSH_SERVER_ALIVE_INTERVAL = 15;
+
     public function generateKeyPair()
     {
         $process = new Process("ssh-keygen -b 2048 -t rsa -f ./ssh.key -N '' -q");
@@ -56,14 +58,15 @@ class SSH
         }
 
         $cmd = sprintf(
-            'ssh -p %s %s@%s -L %s:%s:%s -i %s -fN -o ExitOnForwardFailure=yes -o StrictHostKeyChecking=no',
+            'ssh -p %s %s@%s -L %s:%s:%s -i %s -fN -o ExitOnForwardFailure=yes -o StrictHostKeyChecking=no -o ServerAliveInterval=%d',
             $config['sshPort'],
             $config['user'],
             $config['sshHost'],
             $config['localPort'],
             $config['remoteHost'],
             $config['remotePort'],
-            $this->writeKeyToFile($config['privateKey'])
+            $this->writeKeyToFile($config['privateKey']),
+            self::SSH_SERVER_ALIVE_INTERVAL
         );
 
         $process = new Process($cmd);
