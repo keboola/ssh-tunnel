@@ -19,4 +19,4 @@ WORKDIR /code
 RUN echo "memory_limit = -1" >> /usr/local/etc/php/php.ini
 RUN composer install --no-interaction
 
-ENTRYPOINT php ./vendor/bin/phpunit
+CMD php ./vendor/bin/phpunit
