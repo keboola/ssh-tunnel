@@ -1,13 +1,22 @@
-#VERSION 1.0.0
-FROM keboola/base-php56
-MAINTAINER Miro Cillik <miro@keboola.com>
+FROM php:7.1
 
-# Install dependencies
-#RUN yum -y --enablerepo=epel,remi,remi-php56 install php-devel
+ARG DEBIAN_FRONTEND=noninteractive
+ENV COMPOSER_ALLOW_SUPERUSER 1
+ENV COMPOSER_PROCESS_TIMEOUT 3600
 
-ADD . /code
+COPY composer-install.sh /tmp/composer-install.sh
+
+RUN apt-get update -q \
+  && apt-get install unzip git wget ssh -y --no-install-recommends \
+  && rm -rf /var/lib/apt/lists/* \
+  && /tmp/composer-install.sh \
+  && rm /tmp/composer-install.sh \
+  && mv composer.phar /usr/local/bin/composer
+
+COPY . /code
 WORKDIR /code
-RUN echo "memory_limit = -1" >> /etc/php.ini
+
+RUN echo "memory_limit = -1" >> /usr/local/etc/php/php.ini
 RUN composer install --no-interaction
 
 ENTRYPOINT php ./vendor/bin/phpunit
