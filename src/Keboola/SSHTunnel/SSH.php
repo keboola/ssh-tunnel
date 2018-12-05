@@ -16,7 +16,7 @@ class SSH
 
     public function generateKeyPair()
     {
-        $process = new Process("ssh-keygen -b 2048 -t rsa -f ./ssh.key -N '' -q");
+        $process = Process::fromShellCommandline("ssh-keygen -b 2048 -t rsa -f ./ssh.key -N '' -q");
         $process->run();
 
         $res = [
@@ -58,7 +58,7 @@ class SSH
         }
 
         $cmd = sprintf(
-            'ssh -p %s %s@%s -L %s:%s:%s -i %s -fN -o ExitOnForwardFailure=yes -o StrictHostKeyChecking=no -o ServerAliveInterval=%d',
+            'ssh -p %s %s@%s -L %s:%s:%s -i %s -fN -o ExitOnForwardFailure=yes -o StrictHostKeyChecking=no -o ServerAliveInterval=%d %s',
             $config['sshPort'],
             $config['user'],
             $config['sshHost'],
@@ -66,10 +66,11 @@ class SSH
             $config['remoteHost'],
             $config['remotePort'],
             $this->writeKeyToFile($config['privateKey']),
-            self::SSH_SERVER_ALIVE_INTERVAL
+            self::SSH_SERVER_ALIVE_INTERVAL,
+            (isset($config['compression']) && $config['compression']) ? '-C' : ''
         );
 
-        $process = new Process($cmd);
+        $process = Process::fromShellCommandline($cmd);
         $process->setTimeout(60);
         $process->start();
 

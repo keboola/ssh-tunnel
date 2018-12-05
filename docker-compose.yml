@@ -3,7 +3,7 @@ app:
   volumes:
       - .:/code
   working_dir: /code
-  entrypoint: "./phpunit.sh"
+  command: "./phpunit.sh"
   tty: true
   stdin_open: true
   links:

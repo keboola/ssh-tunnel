@@ -2,14 +2,16 @@
 
 namespace Keboola\SSHTunnel;
 
-/**
- * Created by PhpStorm.
- * User: miroslavcillik
- * Date: 17/02/16
- * Time: 16:06
- */
+use Symfony\Component\Process\Process;
+
 class SSHTest extends \PHPUnit_Framework_TestCase
 {
+    protected function tearDown()
+    {
+        $process = Process::fromShellCommandline('ps aux | grep [s]sh | awk \'{cmd="kill " $2; system(cmd)}\'');
+        $process->run();
+    }
+
     public function testGenerateKeyPair()
     {
         $ssh = new SSH();
@@ -35,6 +37,25 @@ class SSHTest extends \PHPUnit_Framework_TestCase
             'privateKey' => $this->getPrivateKey()
         ]);
 
+        $this->assertEquals(0, $process->getExitCode());
+    }
+
+    public function testOpenTunnelWithCompression()
+    {
+        $ssh = new SSH();
+
+        $process = $ssh->openTunnel([
+            'user' => 'root',
+            'sshHost' => 'sshproxy',
+            'sshPort' => '22',
+            'localPort' => '33306',
+            'remoteHost' => 'mysql',
+            'remotePort' => '3306',
+            'privateKey' => $this->getPrivateKey(),
+            'compression' => true
+        ]);
+
+        $this->assertContains('-C', $process->getCommandLine());
         $this->assertEquals(0, $process->getExitCode());
     }
 
