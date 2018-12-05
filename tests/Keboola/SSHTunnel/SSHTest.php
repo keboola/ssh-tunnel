@@ -8,7 +8,7 @@ class SSHTest extends \PHPUnit_Framework_TestCase
 {
     protected function tearDown()
     {
-        $process = Process::fromShellCommandline('ps aux | grep [s]sh | awk \'{cmd="kill " $2; system(cmd)}\'');
+        $process = Process::fromShellCommandline('pgrep ssh | xargs -r kill');
         $process->run();
     }
 
