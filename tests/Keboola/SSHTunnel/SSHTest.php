@@ -55,7 +55,7 @@ class SSHTest extends \PHPUnit_Framework_TestCase
             'compression' => true
         ]);
 
-        $this->assertContains('-C', $process->getCommandLine());
+        $this->assertContains('-fNC', $process->getCommandLine());
         $this->assertEquals(0, $process->getExitCode());
     }
 

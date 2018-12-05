@@ -59,14 +59,20 @@ class SSH
 
         $cmd = [
             'ssh',
-            sprintf('-fN%s', (isset($config['compression']) && $config['compression'] === true) ? 'C' : ''),
-            sprintf('-p %s', $config['sshPort']),
+            '-p',
+            sprintf('%s', $config['sshPort']),
             sprintf('%s@%s', $config['user'], $config['sshHost']),
-            sprintf('-L %s:%s:%s', $config['localPort'], $config['remoteHost'], $config['remotePort']),
-            sprintf('-i %s', $this->writeKeyToFile($config['privateKey'])),
-            sprintf('-o ServerAliveInterval=%d', self::SSH_SERVER_ALIVE_INTERVAL),
-            '-o ExitOnForwardFailure=yes',
-            '-o StrictHostKeyChecking=no',
+            '-L',
+            sprintf('%s:%s:%s', $config['localPort'], $config['remoteHost'], $config['remotePort']),
+            '-i',
+            sprintf('%s', $this->writeKeyToFile($config['privateKey'])),
+            sprintf('-fN%s', (isset($config['compression']) && $config['compression'] === true) ? 'C' : ''),
+            '-o',
+            sprintf('ServerAliveInterval=%d', self::SSH_SERVER_ALIVE_INTERVAL),
+            '-o',
+            'ExitOnForwardFailure=yes',
+            '-o',
+            'StrictHostKeyChecking=no',
         ];
 
         $process = new Process($cmd);
