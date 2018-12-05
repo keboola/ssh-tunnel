@@ -57,20 +57,19 @@ class SSH
             throw new SSHException(sprintf("Missing parameters '%s'", implode(',', $missingParams)));
         }
 
-        $cmd = sprintf(
-            'ssh -p %s %s@%s -L %s:%s:%s -i %s -fN -o ExitOnForwardFailure=yes -o StrictHostKeyChecking=no -o ServerAliveInterval=%d %s',
-            $config['sshPort'],
-            $config['user'],
-            $config['sshHost'],
-            $config['localPort'],
-            $config['remoteHost'],
-            $config['remotePort'],
-            $this->writeKeyToFile($config['privateKey']),
-            self::SSH_SERVER_ALIVE_INTERVAL,
-            (isset($config['compression']) && $config['compression']) ? '-C' : ''
-        );
+        $cmd = [
+            'ssh',
+            sprintf('-fN%s', (isset($config['compression']) && $config['compression'] === true) ? 'C' : ''),
+            sprintf('-p %s', $config['sshPort']),
+            sprintf('%s@%s', $config['user'], $config['sshHost']),
+            sprintf('-L %s:%s:%s', $config['localPort'], $config['remoteHost'], $config['remotePort']),
+            sprintf('-i %s', $this->writeKeyToFile($config['privateKey'])),
+            sprintf('-o ServerAliveInterval=%d', self::SSH_SERVER_ALIVE_INTERVAL),
+            '-o ExitOnForwardFailure=yes',
+            '-o StrictHostKeyChecking=no',
+        ];
 
-        $process = Process::fromShellCommandline($cmd);
+        $process = new Process($cmd);
         $process->setTimeout(60);
         $process->start();
 
