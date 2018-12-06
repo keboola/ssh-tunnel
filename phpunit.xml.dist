@@ -7,8 +7,7 @@
          convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="true"
-         syntaxCheck="false"
-         bootstrap="tests/bootstrap.php">
+         bootstrap="vendor/autoload.php">
 
     <testsuite name="SSH Tunnel Test Suite">
         <directory>tests/Keboola/SSHTunnel</directory>
