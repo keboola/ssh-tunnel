@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: miroslavcillik
- * Date: 01/09/16
- * Time: 14:01
- */
+
+declare(strict_types=1);
 
 namespace Keboola\SSHTunnel;
 

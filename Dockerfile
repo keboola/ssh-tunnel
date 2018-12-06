@@ -13,6 +13,8 @@ RUN apt-get update -q \
   && rm /tmp/composer-install.sh \
   && mv composer.phar /usr/local/bin/composer
 
+RUN docker-php-ext-install pdo_mysql
+
 COPY . /code
 WORKDIR /code
 
