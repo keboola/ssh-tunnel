@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: miroslavcillik
- * Date: 17/02/16
- * Time: 16:03
- */
+
+declare(strict_types=1);
 
 namespace Keboola\SSHTunnel;
 
@@ -12,16 +8,16 @@ use Symfony\Component\Process\Process;
 
 class SSH
 {
-    const SSH_SERVER_ALIVE_INTERVAL = 15;
+    private const SSH_SERVER_ALIVE_INTERVAL = 15;
 
-    public function generateKeyPair()
+    public function generateKeyPair(): array
     {
         $process = Process::fromShellCommandline("ssh-keygen -b 2048 -t rsa -f ./ssh.key -N '' -q");
         $process->run();
 
         $res = [
             'private' => file_get_contents('./ssh.key'),
-            'public' => file_get_contents('./ssh.key.pub')
+            'public' => file_get_contents('./ssh.key.pub'),
         ];
 
         @unlink('./ssh.key');
@@ -31,51 +27,28 @@ class SSH
     }
 
     /**
-     *
-     * $user, $sshHost, $localPort, $remoteHost, $remotePort, $privateKey, $sshPort = '22'
+     * Open SSH tunnel defined by config
      *
      * @param array $config
-     *  - user
-     *  - sshHost
-     *  - sshPort
-     *  - localPort
-     *  - remoteHost
-     *  - remotePort
-     *  - privateKey
+     *
+     * Configuration fields:
+     *
+     * - user: (string) SSH proxy username. Required.
+     * - sshHost: (string) SSH proxy hostname. Required.
+     * - sshPort: (string) SSH protocol port. Optional, default 22.
+     * - localPort: (string) local port. Optional, default 33006.
+     * - remoteHost: (string) destination machine hostname. Required.
+     * - remotePort: (string) destination machine port. Required.
+     * - privateKey: (string) SSH private key. Required.
+     * - compression: (bool) whether to use compression. Optional, default false.
+     *
      *
      * @return Process
      * @throws SSHException
      */
-    public function openTunnel(array $config)
+    public function openTunnel(array $config): Process
     {
-        $missingParams = array_diff(
-            ['user', 'sshHost', 'sshPort', 'localPort', 'remoteHost', 'remotePort', 'privateKey'],
-            array_keys($config)
-        );
-
-        if (!empty($missingParams)) {
-            throw new SSHException(sprintf("Missing parameters '%s'", implode(',', $missingParams)));
-        }
-
-        $cmd = [
-            'ssh',
-            '-p',
-            sprintf('%s', $config['sshPort']),
-            sprintf('%s@%s', $config['user'], $config['sshHost']),
-            '-L',
-            sprintf('%s:%s:%s', $config['localPort'], $config['remoteHost'], $config['remotePort']),
-            '-i',
-            sprintf('%s', $this->writeKeyToFile($config['privateKey'])),
-            sprintf('-fN%s', (isset($config['compression']) && $config['compression'] === true) ? 'C' : ''),
-            '-o',
-            sprintf('ServerAliveInterval=%d', self::SSH_SERVER_ALIVE_INTERVAL),
-            '-o',
-            'ExitOnForwardFailure=yes',
-            '-o',
-            'StrictHostKeyChecking=no',
-        ];
-
-        $process = new Process($cmd);
+        $process = new Process($this->createSshCommand($config));
         $process->setTimeout(60);
         $process->start();
 
@@ -94,19 +67,67 @@ class SSH
         return $process;
     }
 
-    /**
-     * @param string $key
-     * @return string
-     * @throws SSHException
-     */
-    private function writeKeyToFile($key)
+    private function createSshCommand(array $config): array
+    {
+        $this->validateConfig($config);
+
+        $cmd = [
+            'ssh',
+            '-p',
+            $config['sshPort'],
+            sprintf('%s@%s', $config['user'], $config['sshHost']),
+            '-L',
+            sprintf('%s:%s:%s', $config['localPort'], $config['remoteHost'], $config['remotePort']),
+            '-i',
+            $this->writeKeyToFile($config['privateKey']),
+            '-fN',
+            '-o',
+            sprintf('ServerAliveInterval=%d', self::SSH_SERVER_ALIVE_INTERVAL),
+            '-o',
+            'ExitOnForwardFailure=yes',
+            '-o',
+            'StrictHostKeyChecking=no',
+        ];
+
+        if (isset($config['compression']) && $config['compression'] === true) {
+            $cmd[] = '-C';
+        }
+
+        return $cmd;
+    }
+
+    private function validateConfig(array $config): array
+    {
+        $defaultValues = [
+            'sshPort' => 22,
+            'localPort' => 33006,
+            'compression' => false,
+        ];
+
+        $configWithDefaults = array_merge($defaultValues, $config);
+
+        $missingParams = array_diff(
+            ['user', 'sshHost', 'sshPort', 'localPort', 'remoteHost', 'remotePort', 'privateKey'],
+            array_keys($configWithDefaults)
+        );
+
+        if (!empty($missingParams)) {
+            throw new SSHException(sprintf("Missing parameters '%s'", implode(',', $missingParams)));
+        }
+
+        return $configWithDefaults;
+    }
+
+    private function writeKeyToFile(string $key): string
     {
         if (empty($key)) {
             throw new SSHException("Key must not be empty");
         }
-        $fileName = tempnam('/tmp/',  'ssh-key-');
+        $fileName = (string) tempnam('/tmp/', 'ssh-key-');
+
         file_put_contents($fileName, $key);
         chmod($fileName, 0600);
-        return realpath($fileName);
+
+        return (string) realpath($fileName);
     }
 }
