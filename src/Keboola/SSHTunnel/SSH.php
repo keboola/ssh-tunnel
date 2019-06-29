@@ -73,6 +73,7 @@ class SSH
 
         $cmd = [
             'ssh',
+            '-4',
             '-p',
             $config['sshPort'],
             sprintf('%s@%s', $config['user'], $config['sshHost']),
