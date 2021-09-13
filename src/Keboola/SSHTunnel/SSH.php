@@ -126,7 +126,9 @@ class SSH
         $fileName = (string) tempnam('/tmp/', 'ssh-key-');
 
         file_put_contents($fileName, $key);
-        chmod($fileName, 0600);
+        if (!chmod($fileName, 0600)) {
+            throw new SSHException("Cannot set permissions to SSH private key file.");
+        }
 
         return (string) realpath($fileName);
     }
