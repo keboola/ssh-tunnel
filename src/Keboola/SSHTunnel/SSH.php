@@ -48,7 +48,12 @@ class SSH
      */
     public function openTunnel(array $config): Process
     {
-        $process = new Process($this->createSshCommand($config));
+        $this->validateConfig($config);
+
+        $privateKeyPath = $this->writeKeyToFile($config['privateKey']);
+        sleep(1);
+
+        $process = new Process($this->createSshCommand($config, $privateKeyPath));
         $process->setTimeout(60);
         $process->start();
 
@@ -67,10 +72,8 @@ class SSH
         return $process;
     }
 
-    private function createSshCommand(array $config): array
+    private function createSshCommand(array $config, string $privateKeyPath): array
     {
-        $this->validateConfig($config);
-
         $cmd = [
             'ssh',
             '-p',
@@ -79,7 +82,7 @@ class SSH
             '-L',
             sprintf('%s:%s:%s', $config['localPort'], $config['remoteHost'], $config['remotePort']),
             '-i',
-            $this->writeKeyToFile($config['privateKey']),
+            $privateKeyPath,
             '-fN',
             '-o',
             sprintf('ServerAliveInterval=%d', self::SSH_SERVER_ALIVE_INTERVAL),
