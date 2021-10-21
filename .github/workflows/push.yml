@@ -1,0 +1,13 @@
+name: Build on push
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - name: Build and run tests
+        run: docker-compose run --rm app
