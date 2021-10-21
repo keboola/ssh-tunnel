@@ -10,4 +10,6 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v2
       - name: Build and run tests
-        run: docker-compose run --rm app
+        run: |
+          docker-compose run --rm wait
+          docker-compose run --rm app
