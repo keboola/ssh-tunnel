@@ -16,7 +16,7 @@ composer require keboola/ssh-tunnel
 
 Developed with TTD. Requires Git, Composer, Docker and Docker Compose.
 
-Clone repository, install dependencies and run tests:
+Clone repository, install dependencies, source private key ([stored in 1password](https://start.1password.com/open/i?a=Z6RK6YPRYZESDHSAB2SWYZSSUM&v=y2u4vyq4mfdxrnlnn6zxqgr6e4&i=oizwwpxlbrmhtzed4jyp552hri&h=keboola.1password.com)) and run tests:
 
 ```shell
 git clone git@github.com:keboola/ssh-tunnel.git
