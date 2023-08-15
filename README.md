@@ -24,3 +24,7 @@ cd ssh-tunnel
 composer install
 docker-compose run
 ```
+
+## License
+
+MIT licensed, see [LICENSE](./LICENSE) file.
