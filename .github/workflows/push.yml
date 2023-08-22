@@ -1,7 +1,7 @@
 name: Build on push
-
-on:
-  push:
+on: [ push ]
+env:
+  SSH_KEY_PRIVATE: ${{ secrets.SSH_KEY_PRIVATE }}
 
 jobs:
   build:
@@ -12,4 +12,4 @@ jobs:
       - name: Build and run tests
         run: |
           docker-compose run --rm wait
-          docker-compose run --rm app
+          docker-compose run -e SSH_KEY_PRIVATE --rm app

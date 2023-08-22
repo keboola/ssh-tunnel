@@ -7,10 +7,11 @@ services:
       volumes:
           - .:/code
       working_dir: /code
-      command: bash -c 'set -a && source privateKey.env && composer ci'
+      command: bash -c 'set -a && composer ci'
       environment:
-        MYSQL_DATABASE: testdb
-        MYSQL_ROOT_PASSWORD: somePassword
+        - MYSQL_DATABASE=testdb
+        - MYSQL_ROOT_PASSWORD=somePassword
+        - SSH_KEY_PRIVATE
       links:
         - sshproxy
         - mysql
