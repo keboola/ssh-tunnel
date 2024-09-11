@@ -51,6 +51,21 @@ class SSHTest extends TestCase
 
         $this->assertDbConnection($config);
     }
+
+    public function testOpenTunnelWithDebug(): void
+    {
+        $config = $this->getConfig([
+            'debug' => true,
+        ]);
+
+        $ssh = new SSH();
+        $process = $ssh->openTunnel($config);
+
+        $this->assertContains('-vvv', $process->getCommandLine());
+        $this->assertEquals(0, $process->getExitCode());
+
+        $this->assertDbConnection($config);
+    }
     
     public function testOpenTunnelWrongHost(): void
     {
