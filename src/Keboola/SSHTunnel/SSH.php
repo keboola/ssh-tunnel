@@ -96,6 +96,10 @@ class SSH
             $cmd[] = '-C';
         }
 
+        if (isset($config['debug']) && $config['debug'] === true) {
+            $cmd[] = '-vvv';
+        }
+
         return $cmd;
     }
 
