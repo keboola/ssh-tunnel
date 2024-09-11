@@ -22,7 +22,7 @@ Clone repository, install dependencies, source private key ([stored in 1password
 git clone git@github.com:keboola/ssh-tunnel.git
 cd ssh-tunnel
 composer install
-docker-compose run
+docker compose run
 ```
 
 ## License
