@@ -11,5 +11,5 @@ jobs:
         uses: actions/checkout@v2
       - name: Build and run tests
         run: |
-          docker-compose run --rm wait
-          docker-compose run -e SSH_KEY_PRIVATE --rm app
+          docker compose run --rm wait
+          docker compose run -e SSH_KEY_PRIVATE --rm app
