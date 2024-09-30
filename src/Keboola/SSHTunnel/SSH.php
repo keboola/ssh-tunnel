@@ -8,6 +8,7 @@ use Symfony\Component\Process\Process;
 
 class SSH
 {
+    private const SSH_CONNECT_TIMEOUT_SECONDS = 60;
     private const SSH_SERVER_ALIVE_INTERVAL = 15;
 
     public function generateKeyPair(): array
@@ -84,6 +85,8 @@ class SSH
             '-i',
             $privateKeyPath,
             '-fN',
+            '-o',
+            sprintf('ConnectTimeout=%d', self::SSH_CONNECT_TIMEOUT_SECONDS),
             '-o',
             sprintf('ServerAliveInterval=%d', self::SSH_SERVER_ALIVE_INTERVAL),
             '-o',
