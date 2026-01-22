@@ -133,7 +133,16 @@ class SSH
         if (empty($key)) {
             throw new SSHException("Key must not be empty");
         }
-        $fileName = (string) tempnam('/tmp/', 'ssh-key-');
+
+        // Set restrictive umask before creating the temp file to ensure it's created with 0600 permissions
+        // This prevents a race condition where the file could be read with insecure permissions
+        // before chmod() is called
+        $oldUmask = umask(0077);
+        try {
+            $fileName = (string) tempnam('/tmp/', 'ssh-key-');
+        } finally {
+            umask($oldUmask);
+        }
 
         file_put_contents($fileName, $key);
         if (!chmod($fileName, 0600)) {
