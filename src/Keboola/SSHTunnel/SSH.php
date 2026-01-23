@@ -133,13 +133,30 @@ class SSH
         if (empty($key)) {
             throw new SSHException("Key must not be empty");
         }
-        $fileName = (string) tempnam('/tmp/', 'ssh-key-');
+
+        // Set restrictive umask before creating the temp file to ensure it's created with 0600 permissions
+        // This prevents a race condition where the file could be read with insecure permissions
+        // before chmod() is called
+        $oldUmask = umask(0077);
+        try {
+            $fileName = tempnam('/tmp/', 'ssh-key-');
+            if ($fileName === false) {
+                throw new SSHException("Cannot create temporary file for SSH private key");
+            }
+        } finally {
+            umask($oldUmask);
+        }
 
         file_put_contents($fileName, $key);
         if (!chmod($fileName, 0600)) {
             throw new SSHException("Cannot set permissions to SSH private key file.");
         }
 
-        return (string) realpath($fileName);
+        $realPath = realpath($fileName);
+        if ($realPath === false) {
+            throw new SSHException("Cannot resolve path to SSH private key file.");
+        }
+
+        return $realPath;
     }
 }
