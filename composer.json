@@ -11,12 +11,13 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "symfony/process": "^4.2|^5.0"
+        "php": ">=7.1",
+        "symfony/process": "^4.2|^5.0|^6.0|^7.0"
     },
     "require-dev": {
         "keboola/coding-standard": ">=9.0.0",
-        "phpstan/phpstan": "^0.12.14",
-        "phpunit/phpunit": "^7.0"
+        "phpstan/phpstan": "^1.0",
+        "phpunit/phpunit": "^9.0"
     },
     "autoload": {
         "psr-4": {

@@ -46,7 +46,7 @@ class SSHTest extends TestCase
         $ssh = new SSH();
         $process = $ssh->openTunnel($config);
 
-        $this->assertContains('-C', $process->getCommandLine());
+        $this->assertStringContainsString('-C', $process->getCommandLine());
         $this->assertEquals(0, $process->getExitCode());
 
         $this->assertDbConnection($config);
@@ -61,7 +61,7 @@ class SSHTest extends TestCase
         $ssh = new SSH();
         $process = $ssh->openTunnel($config);
 
-        $this->assertContains('-vvv', $process->getCommandLine());
+        $this->assertStringContainsString('-vvv', $process->getCommandLine());
         $this->assertEquals(0, $process->getExitCode());
 
         $this->assertDbConnection($config);

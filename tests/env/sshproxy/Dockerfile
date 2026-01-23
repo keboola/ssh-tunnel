@@ -1,4 +1,6 @@
-FROM ubuntu:14.04
+FROM ubuntu:22.04
+
+ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update
 
