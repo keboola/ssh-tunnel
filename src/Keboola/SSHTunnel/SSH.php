@@ -139,7 +139,10 @@ class SSH
         // before chmod() is called
         $oldUmask = umask(0077);
         try {
-            $fileName = (string) tempnam('/tmp/', 'ssh-key-');
+            $fileName = tempnam('/tmp/', 'ssh-key-');
+            if ($fileName === false) {
+                throw new SSHException("Cannot create temporary file for SSH private key");
+            }
         } finally {
             umask($oldUmask);
         }
@@ -149,6 +152,11 @@ class SSH
             throw new SSHException("Cannot set permissions to SSH private key file.");
         }
 
-        return (string) realpath($fileName);
+        $realPath = realpath($fileName);
+        if ($realPath === false) {
+            throw new SSHException("Cannot resolve path to SSH private key file.");
+        }
+
+        return $realPath;
     }
 }
