@@ -93,6 +93,12 @@ class SSH
             'ExitOnForwardFailure=yes',
             '-o',
             'StrictHostKeyChecking=no',
+            // Enable legacy ssh-rsa algorithm for compatibility with older SSH servers
+            // OpenSSH 8.8+ disabled ssh-rsa by default due to SHA-1 deprecation
+            '-o',
+            'PubkeyAcceptedAlgorithms=+ssh-rsa',
+            '-o',
+            'HostKeyAlgorithms=+ssh-rsa',
         ];
 
         if (isset($config['compression']) && $config['compression'] === true) {

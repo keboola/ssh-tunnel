@@ -12,6 +12,11 @@ RUN echo 'root:root' |chpasswd
 RUN sed -ri 's/^PermitRootLogin\s+.*/PermitRootLogin yes/' /etc/ssh/sshd_config
 RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
 
+# Enable legacy ssh-rsa algorithm for testing compatibility with older clients
+# OpenSSH 8.8+ disabled ssh-rsa by default due to SHA-1 deprecation
+RUN echo "PubkeyAcceptedAlgorithms +ssh-rsa" >> /etc/ssh/sshd_config
+RUN echo "HostKeyAlgorithms +ssh-rsa" >> /etc/ssh/sshd_config
+
 RUN mkdir ~/.ssh
 RUN echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC2tGpPt3qrI/G4QOJeP7kA2ihC9U/cY42GNZuedrKocNGGQBgvjGNRP1kCexXeaJ25KUti+tFbPjVrdt6xhqALiwUupSYFusaAVEDcwl6KLMGAOHWD0X7hdraL3w4ATyNTBvowyc9ZvsollNyTUqDWxN2USTfk89Xd+S2noAfoCUJd4fMEmBeAAqlYTajHGKSKYcRGokxci7dyaXoHEQgsd0giZWIZATNUkWTV36bTnGjMxz4pK6LHNglQRNO4GpxQI5Bmie60gVcOIQAhmbrTq9bwcoLq6SGBOUO/Vr6ZnLcI8h4W50HSNUeXKtFMeNMgzDgS8x4Ow0XLEpjujRGh miroslavcillik@Miroslavs-MacBook-Air.local" >> ~/.ssh/authorized_keys
 
