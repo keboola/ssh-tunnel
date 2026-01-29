@@ -66,7 +66,23 @@ class SSHTest extends TestCase
 
         $this->assertDbConnection($config);
     }
-    
+
+    public function testOpenTunnelIncludesLegacyAlgorithmOptions(): void
+    {
+        $config = $this->getConfig();
+
+        $ssh = new SSH();
+        $process = $ssh->openTunnel($config);
+
+        // Verify legacy ssh-rsa algorithm options are included for compatibility with older servers
+        // OpenSSH 8.8+ disabled ssh-rsa by default, so we need to explicitly enable it
+        $this->assertStringContainsString('PubkeyAcceptedAlgorithms=+ssh-rsa', $process->getCommandLine());
+        $this->assertStringContainsString('HostKeyAlgorithms=+ssh-rsa', $process->getCommandLine());
+        $this->assertEquals(0, $process->getExitCode());
+
+        $this->assertDbConnection($config);
+    }
+
     public function testOpenTunnelWrongHost(): void
     {
         $this->expectException('PDOException');
