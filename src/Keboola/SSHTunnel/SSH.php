@@ -10,6 +10,7 @@ class SSH
 {
     private const SSH_CONNECT_TIMEOUT_SECONDS = 60;
     private const SSH_SERVER_ALIVE_INTERVAL = 15;
+    private const SSH_SERVER_ALIVE_COUNT_MAX = 20;
 
     public function generateKeyPair(): array
     {
@@ -89,6 +90,8 @@ class SSH
             sprintf('ConnectTimeout=%d', self::SSH_CONNECT_TIMEOUT_SECONDS),
             '-o',
             sprintf('ServerAliveInterval=%d', self::SSH_SERVER_ALIVE_INTERVAL),
+            '-o',
+            sprintf('ServerAliveCountMax=%d', self::SSH_SERVER_ALIVE_COUNT_MAX),
             '-o',
             'ExitOnForwardFailure=yes',
             '-o',

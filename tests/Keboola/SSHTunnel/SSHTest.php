@@ -83,6 +83,20 @@ class SSHTest extends TestCase
         $this->assertDbConnection($config);
     }
 
+    public function testOpenTunnelIncludesServerAliveOptions(): void
+    {
+        $config = $this->getConfig();
+
+        $ssh = new SSH();
+        $process = $ssh->openTunnel($config);
+
+        $this->assertStringContainsString('ServerAliveInterval=15', $process->getCommandLine());
+        $this->assertStringContainsString('ServerAliveCountMax=20', $process->getCommandLine());
+        $this->assertEquals(0, $process->getExitCode());
+
+        $this->assertDbConnection($config);
+    }
+
     public function testOpenTunnelWrongHost(): void
     {
         $this->expectException('PDOException');
